@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="h-screen flex flex-col">
+    <div id="roleModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-80 text-center">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Select Dashboard View</h2>
+      <button onclick="selectRole('officer_view')" class="w-full bg-green-600 text-white py-3 rounded-lg mb-3 hover:bg-green-700 font-semibold">Officer</button>
+      <button onclick="selectRole('people_view')" class="w-full bg-blue-600 text-white py-3 rounded-lg mb-3 hover:bg-blue-700 font-semibold">Applicant</button>
+      <button onclick="selectRole('government_view')" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-semibold">Government</button>
+    </div>
+  </div>
+    <header class="bg-white shadow-md sticky top-0 z-50 ">
+        <nav class="h-16 w-full flex justify-between items-center px-10" >
+            <a href="#" class="text-2xl font-bold text-green-700">FRA</a>
+            <div class="text-center space-x-6">
+                 <a href="index.html" class="font-black text-gray-800 hover:text-green-400">Home</a>
+                 <a id="dashboardBtn" href="#" class="font-black text-gray-800 hover:text-green-400">Dashboard</a>
+                 <a href="#" class="font-black text-gray-800 hover:text-green-400">Contact US</a>
+                 <a href="#" class="font-black text-gray-800 hover:text-green-400">About</a>
+            </div>
+        </nav>
+    </header>
+    <main class="flex flex-1 bg-gray-100 overflow-hidden">
+    <!-- Sidebar -->
+        <div id="sidebar" class="w-84 bg-white shadow-lg flex flex-col overflow-auto">
+            <!-- Logo / Title -->
+            <div class="text-2xl font-bold text-green-700 mb-4 flex justify-center mt-4">
+              FRA
+            </div>
+        
+            <!-- Sidebar buttons -->
+            <div id="sidebar_cont" class="flex flex-col flex-1">
+              <button id="side_dashbds"  class="font-bold text-green-700 py-2 px-4 bg-gray-100 rounded-lg mx-3 my-1 hidden">Dashboard</button>
+              <button id="side_list" class="font-bold text-green-700 py-2 px-4 bg-gray-100 rounded-lg mx-3 my-1 hidden">List of Application</button>
+              <div id="request_list_box" class="m-2 h-96  rounded-lg bg-gray-200 hidden">
+                <div class="flex gap-2 justify-self-start mt-2 mx-3">
+                    <button class="font-bold py-1 px-6  bg-gray-400 rounded-full">IFR</button>                           
+                    <button class="font-bold py-1 px-6  bg-gray-400 rounded-full">CR</button>
+                    <button class="font-bold py-1 px-6  bg-gray-400 rounded-full">CFR</button>
+                </div>
+                <div id="request_search" class="bg-gray-400 rounded-full h-6  mt-2 mx-3">
+                    <span class=" flex justify-center">search</span>
+
+                </div>
+                <div id="request_list" class="h-72 rounded-lg bg-gray-400 mt-2 mx-3 overflow-auto">
+                    <ul class="m-3">  
+                    </ul>
+                </div>
+              </div>
+              <button id="side_reports" class="font-bold text-green-700 py-2 px-4 bg-gray-100 rounded-lg mx-3 my-1 hidden">Report</button>
+              <button id="side_doc" class="font-bold text-green-700 py-2 px-4 bg-gray-100 rounded-lg mx-3 my-1 hidden">Upload Doc</button>
+            </div>
+        
+            <!-- Footer -->
+            <p class="mt-auto mb-4 text-center">yt</p>
+        </div>
+      
+        <!-- Dashboard -->
+        <div id="dashboard" class="flex-1 overflow-auto p-10">
+            <!-- Government View -->
+            <div id="government_view" class="hidden space-y-6">
+                <div>
+                  <h1 class="text-3xl font-bold text-gray-800">Government Dashboard</h1>
+                  <p class="text-gray-600 mb-6">National level FRA claims overview and analytics.</p>
+                </div>
+          
+                <div id="stats" class="flex gap-4">
+                    <div class="bg-white flex-1 p-6 rounded-lg shadow-md">
+                      <h3 class="text-gray-500">Total Claims Filed</h3>
+                      <p class="text-3xl font-bold">777</p>
+                    </div>
+                    <div class="bg-white flex-1 p-6 rounded-lg shadow-md">
+                      <h3 class="text-gray-500">Area Recognized (ha)</h3>
+                      <p class="text-3xl font-bold">9879</p>
+                    </div>
+                    <div class="bg-white flex-1 p-6 rounded-lg shadow-md">
+                      <h3 class="text-gray-500">Pending Verification</h3>
+                      <p class="text-3xl font-bold">7987</p>
+                    </div>
+                </div>
+          
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                  <h2 class="text-xl font-semibold mb-4">National FRA Atlas</h2>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <select class="p-2 border rounded-md"><option>Select State</option><option>State A</option></select>
+                        <select class="p-2 border rounded-md"><option>Select District</option><option>District X</option></select>
+                        <select class="p-2 border rounded-md"><option>Select Village</option><option>Village 1</option></select>
+                    </div>
+                  <div id="gov_map" class="w-full h-64 rounded-lg bg-gray-50"></div>
+                </div>
+            </div>
+      
+            <!-- Officer View -->
+            <div id="officer_view" class="space-y-6 hidden">
+                <div>
+                  <h1 class="text-3xl font-bold text-gray-800">Officer Dashboard</h1>
+                  <p class="text-gray-600 mb-6">Claim verification and progress monitoring at district level.</p>
+                </div>
+           
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h2 class="text-xl font-semibold mb-4">GIS Map & Filters</h2>
+                      <div class="flex flex-wrap gap-4 mb-4">
+                          <select class="p-2 border rounded-md"><option>Select State</option><option>State A</option></select>
+                          <select class="p-2 border rounded-md"><option>Select District</option><option>District X</option></select>
+                          <select class="p-2 border rounded-md"><option>Select Village</option><option>Village 1</option></select>
+                      </div>
+                  <div id="officer_map" class="w-full h-[500px]  rounded-lg bg-gray-50 hidden"></div>
+                  <div id="officer_map_request" class="w-full h-[500px]  rounded-lg bg-gray-50 hidden"> nnevkvfn</div>
+                </div>
+                <div class="flex gap-3">
+                     <div class="bg-white p-6 rounded-lg shadow-md flex-1">
+                         <h2 class="text-xl font-semibold mb-4">Claim Status Distribution</h2>
+                         <canvas id="claimStatusChart"></canvas>
+                     </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md flex-1">
+                         <h2 class="text-xl font-semibold mb-4">Monthly Progress</h2>
+                         <canvas id="monthlyProgressChart"></canvas>
+                     </div>
+                </div>
+            </div>
+            <div id="people_view" class="hidden">
+                  <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Community Dashboard</h1>
+                    <p class="text-gray-600 mb-6">Track your village's claim status and scheme eligibility.</p>
+                  </div>
+                  <div id="applicant_detail" >
+                      <div class="w-full mx-auto ">
+                      <!-- Display Container (The main div requested by the user) -->
+                      <div id="applicant-details" class=" bg-white card rounded-2xl p-6 sm:p-10 space-y-8">
+                          
+                          <h2 class="flex items-center text-2xl font-bold pb-4 text-primary-indigo border-b-2 border-primary-indigo/20">
+                              <!-- Icon for Personal Information -->
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3">
+                                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                              </svg>
+                              Required Personal Information
+                          </h2>
+              
+                          <!-- Grid for Displaying Details -->
+                          <div class="flex gap-6 flex-wrap ">
+                              
+                              <!-- Full Name (Spanning 2 columns for prominence) -->
+                              <div class="md:col-span-2 detail-item bg-primary-indigo/5 border-primary-indigo/30">
+                                  <span class="font-bold ">Full Name (as per ID):</span>
+                                  <span id="applicant_name">Sita Devi</span>
+                              </div>
+              
+                              <!-- Category -->
+                              <div  >
+                                  <span class="font-bold">Category:</span>
+                                  <span id="applicant_catogary" >Scheduled Tribe (ST)</span>
+                              </div>
+              
+                              <!-- ID Proof Type -->
+                              <div  >
+                                  <span class="font-bold">ID Proof Type:</span>
+                                  <span id="applicant_id_proof" >Aadhaar Card</span>
+                              </div>
+              
+                              <!-- ID Number -->
+                              <div  >
+                                  <span class="font-bold">ID Number:</span>
+                                  <span id="applicant_id_no" class="detail-value text-red-600">9876 XXXX 1234</span>
+                              </div>
+              
+                              <!-- Phone Number -->
+                              <div  >
+                                  <span class="font-bold">Phone Number:</span>
+                                  <span id="applicant_ph_no" >+91 98765 43210</span>
+                              </div>
+              
+                              <!-- Full Postal Address (Spanning 2 columns) -->
+                              <div class="md:col-span-2 ">
+                                  <span class="font-bold">Full Postal Address:</span>
+                                  <span id="applicant_adress">
+                                      House No. 12B, Forest Colony, Village: Chakmaghat,<br>
+                                      Post: Ramnagar, District: West Tripura, PIN: 799008
+                                  </span>
+                              </div> 
+                          </div>
+                      </div>
+                  </div>
+                  </div>
+                  <div id="appl_result" class="flex gap-2.5 my-6">
+                      <div class=" flex-1 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md shadow-md">
+                          <h3 class="font-bold">Accepted</h3>
+                          <p>Your community forest rights claim has been approved.</p>
+                      </div>
+                      <div class=" flex-1 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md shadow-md">
+                          <h3 class="font-bold">Pending</h3>
+                          <p>Individual land claim is under review by the DLC.</p>
+                      </div>
+                      <div class=" flex-1 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-md">
+                          <h3 class="font-bold">Rejected</h3>
+                          <p>Claim for minor produce rights rejected. Reason: Insufficient evidence.</p>
+                      </div>
+                  </div>
+                  <div id="appl_tracking">
+   
+                  </div>
+                  <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                          <h2 class="text-xl font-semibold mb-4">Your Claims Area Map</h2>
+                          <div id="people_map" class="w-full h-64 rounded-lg bg-gray-50"></div>
+                  </div>
+                  <div class="bg-white p-6 rounded-lg shadow-md">
+                      <h2 class="text-xl font-semibold mb-4">Eligible Government Schemes (DSS Recommendations)</h2>
+                      <div class="space-y-4">
+                          <div class="border p-4 rounded-lg">
+                              <h3 class="font-bold text-green-700">Pradhan Mantri Kisan Samman Nidhi</h3>
+                              <p class="text-sm text-gray-600">As a recognized land holder, you are eligible for this scheme. Provides income support.</p>
+                              <a href="#" class="text-sm text-blue-600 hover:underline">Learn more & Apply</a>
+                          </div>
+                          <div class="border p-4 rounded-lg">
+                              <h3 class="font-bold text-green-700">National Bamboo Mission</h3>
+                              <p class="text-sm text-gray-600">Your community forest rights include bamboo cultivation. This scheme provides subsidies.</p>
+                              <a href="#" class="text-sm text-blue-600 hover:underline">Learn more & Apply</a>
+                          </div>
+                      </div>
+                  </div>
+            </div>
+        </div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="fra.js"></script>
+<script src="map.js"></script>
+<script src="fradata.js"></script>
+</body>
+</html>
